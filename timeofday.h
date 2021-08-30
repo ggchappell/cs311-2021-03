@@ -32,8 +32,6 @@ public:
 
     // Ctor from hours, minutes, seconds
     // Set time to given # of hours, minutes, seconds past midnight.
-    // Extreme values of hh, mm, ss are corrected by shifting some whole
-    // number of days forward or backward.
     TimeOfDay(int hh,
               int mm,
               int ss)

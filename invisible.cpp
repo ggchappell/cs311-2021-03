@@ -14,6 +14,8 @@
 using std::cout;
 using std::endl;
 using std::cin;
+#include <vector>
+using std::vector;
 
 
 // userPause
@@ -62,7 +64,7 @@ private:
 
 
 // Global variables
-Dog puppies[7];
+vector<Dog> puppies(7);
 
 
 // Main program

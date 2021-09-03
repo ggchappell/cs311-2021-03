@@ -6,12 +6,22 @@
 #include <iostream>
 using std::cout;
 using std::endl;
+using std::cin;
 #include <cassert>
 // For assert
 #include <vector>
 using std::vector;
 #include <cstddef>
 using std::size_t;
+
+
+// userPause
+// Wait for user to press ENTER: read all chars through first newline.
+void userPause()
+{
+    std::cout.flush();
+    while (std::cin.get() != '\n') ;
+}
 
 
 // sumTwo
@@ -36,5 +46,10 @@ int main()
 
     cout << "Sum #1: " << sumTwo(data, 0, 2) << endl;
     cout << "Sum #2: " << sumTwo(data, 0, 20) << endl;
+    cout << endl;
+
+    // Wait for user
+    cout << "Press ENTER to quit ";
+    userPause();
 }
 

@@ -81,9 +81,9 @@ private:
 // std::bad_alloc if either allocation is unsuccessful.
 // Pre: None.
 // Post:
-//     nptra points to object with name "Object B", allocated with new,
+//     nptra points to object with name "Object A", allocated with new,
 //      ownership transfered to caller.
-//     nptrb points to object with name "Object C", allocated with new,
+//     nptrb points to object with name "Object B", allocated with new,
 //      ownership transfered to caller.
 // May throw std::bad_alloc.
 void allocate2(Named * & nptra,

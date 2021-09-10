@@ -1,4 +1,4 @@
-// allocate2.cpp  UNFINISHED
+// allocate2.cpp
 // Glenn G. Chappell
 // 2021-09-10
 //
@@ -89,11 +89,21 @@ private:
 void allocate2(Named * & nptra,
                Named * & nptrb)
 {
-    // DUMMY ASSIGNMENTS
-    nptra = nullptr;
-    nptrb = nullptr;
+    nptra = new Named("Object A");
+    // If the 1st allocation fails, then the "new" throws, and we leave.
+    // No clean-up necessary.
 
-    // TODO: WRITE THIS!!!
+    try
+    {
+        nptrb = new Named("Object B");
+        // If the 2nd allocation fails, then we need to clean up the
+        // first.
+    }
+    catch (...)
+    {
+        delete nptra;
+        throw;  // We cannot handle the exception here; re-throw it
+    }
 }
 
 

@@ -1,4 +1,4 @@
-// use_list.cpp  UNFINISHED
+// use_list.cpp
 // Glenn G. Chappell
 // 2021-09-13
 //
@@ -33,10 +33,16 @@ void userPause()
 // NOTE: The above are the requirements for LLNode<ValType>; no member
 // functions of ValType are actually used here.
 template <typename ValType>
-size_t size(LLNode<ValType> * head)
+size_t size(const LLNode<ValType> * head)
 {
-    return size_t(42);  // DUMMY
-    // TODO: WRITE THIS!!!
+    auto p = head;       // Iterates through list
+    size_t counter = 0;  // Number of nodes so far
+    while (p != nullptr)
+    {
+        p = p->_next;
+        ++counter;
+    }
+    return counter;
 }
 
 

@@ -32,10 +32,12 @@ using bignum = uint_fast64_t;  // fastest unsigned w/ >= 64 bits
 bignum fibo(int n)
 {
     // BASE CASE
+
     if (n <= 1)
         return bignum(n);
 
     // RECURSIVE CASE
+
     // Invariant: n >= 2
     return fibo(n-2) + fibo(n-1);
 }

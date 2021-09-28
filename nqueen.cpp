@@ -143,6 +143,7 @@ void nQueen_recurse(BoardType & board,
 //  called.
 {
     // BASE CASE
+
     if (n == static_cast<int>(board.size()))
     {
         // A full solution! Print it.
@@ -151,6 +152,7 @@ void nQueen_recurse(BoardType & board,
     }
 
     // RECURSIVE CASE
+
     // Try each position in next row
     for (int newcol = 0; newcol < n; ++newcol)
     {

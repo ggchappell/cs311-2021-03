@@ -121,6 +121,7 @@ int nQueenCount_recurse(BoardType & board,
 //  called.
 {
     // BASE CASE
+
     if (n == static_cast<int>(board.size()))
     {
         // A full solution! It counts as 1; return that.
@@ -128,6 +129,7 @@ int nQueenCount_recurse(BoardType & board,
     }
 
     // RECURSIVE CASE
+
     int total = 0;  // Running total of full solutions found
 
     // Try each position in next row

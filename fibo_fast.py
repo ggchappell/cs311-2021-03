@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # fibo_fast.py
 # Glenn G. Chappell
-# 2021-09-17
+# Started: 2021-09-17
+# Updated: 2021-09-28
 #
 # For CS 311 Fall 2021
 """Computing Fibonacci Numbers
@@ -103,7 +104,7 @@ def fibo(n):
 def print_results(n):
     """Compute Fibonacci number F(n); print in pretty form."""
 
-    print("F({}) = {}".format(n, fibo(n)))
+    print(f"F({n}) = {fibo(n)}")
 
 
 # Main program

@@ -1,4 +1,4 @@
-// merge_sort.cpp  UNFINISHED
+// merge_sort.cpp
 // Glenn G. Chappell
 // 2021-09-29
 //
@@ -22,6 +22,7 @@ using std::swap;
 using std::begin;
 using std::end;
 using std::distance;
+using std::advance;
 using std::iterator_traits;
 #include <algorithm>
 using std::move;
@@ -97,7 +98,26 @@ void stableMerge(FDIter first, FDIter middle, FDIter last)
 template <typename FDIter>
 void mergeSort(FDIter first, FDIter last)
 {
-    // TODO: WRITE THIS!!!
+    // Compute size of range
+    auto size = distance(first, last);
+
+    // BASE CASE
+
+    if (size <= 1)
+        return;
+
+    // RECURSIVE CASE
+
+    // Create iterator ("middle") to middle of range
+    auto middle = first;
+    advance(middle, size/2);
+
+    // Recursively sort the two lists
+    mergeSort(first, middle);
+    mergeSort(middle, last);
+
+    // And merge them
+    stableMerge(first, middle, last);
 }
 
 

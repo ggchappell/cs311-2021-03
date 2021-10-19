@@ -1,8 +1,8 @@
 // fsarray.h  UNFINISHED
-// VERSION 3
+// VERSION 4
 // Glenn G. Chappell
 // Started: 2021-10-12
-// Updated: 2021-10-15
+// Updated: 2021-10-18
 //
 // For CS 311 Fall 2021
 // Header for class FSArray
@@ -25,6 +25,12 @@
 // - v3:
 //   - Document exception-safety guarantees for most functions.
 //   - Write copy ctor.
+// - v4:
+//   - Revise class invariants to allow for _data being nullptr if _size
+//     is zero.
+//   - Revise ctor from size, copy ctor accordingly.
+//   - Write move ctor.
+//   - Mark various functions as noexcept.
 
 #ifndef FILE_FSARRAY_H_INCLUDED
 #define FILE_FSARRAY_H_INCLUDED
@@ -46,7 +52,8 @@
 // Invariants:
 //     _size >= 0.
 //     _data points to an array of value_type, allocated with new [],
-//      owned by *this, holding _size value_type values.
+//      owned by *this, holding _size value_type values -- UNLESS
+//      _size == 0, in which case _data may be nullptr.
 class FSArray {
 
 // ***** FSArray: types *****
@@ -69,14 +76,16 @@ public:
     // Strong Guarantee
     explicit FSArray(size_type size=0)
         :_size(size),
-         _data(new value_type[size])
+         _data(size == 0 ? nullptr
+                         : new value_type[size])
     {}
 
     // Copy ctor
     // Strong Guarantee
     FSArray(const FSArray & other)
         :_size(other.size()),
-         _data(new value_type[other.size()])
+         _data(other.size() == 0 ? nullptr
+                                 : new value_type[other.size()])
     {
         std::copy(other.begin(), other.end(), begin());
         // The above call to std::copy does not throw, since it copies
@@ -87,8 +96,11 @@ public:
     // Move ctor
     // No-Throw Guarantee
     FSArray(FSArray && other) noexcept
+        :_size(other._size),
+         _data(other._data)
     {
-        // TODO: WRITE THIS!!!
+        other._size = 0;
+        other._data = nullptr;
     }
 
     // Copy assignment
@@ -118,6 +130,8 @@ public:
 public:
 
     // operator[] - non-const & const
+    // Pre:
+    //     ???
     // No-Throw Guarantee
     value_type & operator[](size_type index)
     {
@@ -133,36 +147,36 @@ public:
 
     // size
     // No-Throw Guarantee
-    size_type size() const
+    size_type size() const noexcept
     {
         return _size;
     }
 
     // empty
     // No-Throw Guarantee
-    bool empty() const
+    bool empty() const noexcept
     {
         return size() == 0;
     }
 
     // begin - non-const & const
     // No-Throw Guarantee
-    iterator begin()
+    iterator begin() noexcept
     {
         return _data;
     }
-    const_iterator begin() const
+    const_iterator begin() const noexcept
     {
         return _data;
     }
 
     // end - non-const & const
     // No-Throw Guarantee
-    iterator end()
+    iterator end() noexcept
     {
         return begin() + size();
     }
-    const_iterator end() const
+    const_iterator end() const noexcept
     {
         return begin() + size();
     }

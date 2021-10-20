@@ -89,11 +89,11 @@ public:
     // No-Throw Guarantee
     FSArray(FSArray && other) noexcept;
 
-    // Copy assignment
+    // Copy assignment operator
     // ??? Guarantee
     FSArray & operator=(const FSArray & other);
 
-    // Move assignment
+    // Move assignment operator
     // No-Throw Guarantee
     FSArray & operator=(FSArray && other) noexcept;
 

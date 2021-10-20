@@ -23,9 +23,9 @@ using std::copy;
 // Copy ctor
 // See header for info.
 FSArray::FSArray(const FSArray & other)
-             :_size(other.size()),
-              _data(other.size() == 0 ? nullptr
-                                      : new value_type[other.size()])
+    :_size(other.size()),
+     _data(other.size() == 0 ? nullptr
+                             : new value_type[other.size()])
 {
     copy(other.begin(), other.end(), begin());
     // The above call to std::copy does not throw, since it copies int
@@ -37,8 +37,8 @@ FSArray::FSArray(const FSArray & other)
 // Move ctor
 // See header for info.
 FSArray::FSArray(FSArray && other) noexcept
-             :_size(other._size),
-              _data(other._data)
+    :_size(other._size),
+     _data(other._data)
 {
     other._size = 0;
     other._data = nullptr;
@@ -74,7 +74,7 @@ void FSArray::resize(FSArray::size_type newsize)
 // insert
 // See header for info.
 FSArray::iterator FSArray::insert(FSArray::iterator pos,
-                                 const FSArray::value_type & item)
+                                  const FSArray::value_type & item)
 {
     // TODO: WRITE THIS!!!
     return begin();  // DUMMY

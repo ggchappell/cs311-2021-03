@@ -1,6 +1,7 @@
-// llnode2.h  UNFINISHED
+// llnode2.h
 // Glenn G. Chappell
-// 2021-10-22
+// Updated: 2021-10-25
+// Started: 2021-10-22
 //
 // For CS 311 Fall 2021
 // Header for struct LLNode2
@@ -14,6 +15,23 @@
 
 #include <cstddef>
 // For std::size_t
+#include <memory>
+// For std::unique_ptr
+// For std::make_unique
+#include <utility>
+// For std::move
+
+
+// *********************************************************************
+// Forward declarations
+// *********************************************************************
+
+
+template <typename ValType>
+struct LLNode2;
+
+template <typename ValType>
+void pop_front(std::unique_ptr<LLNode2<ValType>> & head) noexcept;
 
 
 // *********************************************************************
@@ -24,34 +42,35 @@
 // struct LLNode2
 // Singly Linked List node, with client-specified value type
 // Invariants:
-//     Either _next is nullptr, or _next points to an LLNode2, allocated
-//      with new, owned by *this.
+//     Either _next is null or _next points to an LLNode2 (and thus
+//      _next points to a null-ptr-terminated Linked List of LLNode2).
 // Requirements on Types:
 //     ValType must have a copy ctor and a (non-throwing) dctor.
 template <typename ValType>
 struct LLNode2 {
-    ValType    _data;  // Data for this node
-    LLNode2 *  _next;  // Ptr to next node, or nullptr if none
+    ValType                  _data;  // Data for this node
+    std::unique_ptr<LLNode2> _next;  // Ptr to next node, null if none
 
     // The following simplify creation & destruction
 
     // 1- & 2-param ctor
     // _data is set to data (given). _next is set to next, if given, or
     // nullptr if not.
-    // Pre:
-    //     theNext, if passed, is either nullptr, or else it points to
-    //      an LLNode2 allocated with new, with ownership transferred to
-    //      *this.
+    // No-Throw Guarantee
     explicit LLNode2(const ValType & data,
-                     LLNode2 * next = nullptr)
+                     std::unique_ptr<LLNode2> & next = nullptr)
         :_data(data),
-         _next(next)
+         _next(std::move(next))
     {}
 
     // dctor
-    // Does delete on _next.
+    // Iterative: avoid recursive destruction.
+    // No-Throw Guarantee
     ~LLNode2()
-    { delete _next; }
+    {
+        while (_next)
+            pop_front(_next);
+    }
 
     // No default ctor, no copy/move operations.
     LLNode2() = delete;
@@ -69,22 +88,23 @@ struct LLNode2 {
 
 
 // size
-// Given ptr to Linked List, return its size (number of nodes).
+// Given unique_ptr to Linked List, return its size (number of nodes).
 // Pre:
-//     head is ptr to nullptr-terminated Linked List, or nullptr for
-//      empty Linked List.
+//     head is ptr to null-ptr-terminated Linked List, or is null.
 // Requirements on Types:
 //     ValType must have a copy ctor and a (non-throwing) dctor.
-// NOTE: The above are the requirements for LLNode<ValType>; no member
+// NOTE: The above are the requirements for LLNode2<ValType>; no member
 // functions of ValType are actually used here.
+// No-Throw Guarantee
 template <typename ValType>
-std::size_t size(const LLNode<ValType> * head)
+std::size_t size(const std::unique_ptr<LLNode2<ValType>> & head)
+    noexcept
 {
-    auto p = head;            // Iterates through list
+    auto p = head.get();      // Iterates through list
     std::size_t counter = 0;  // Number of nodes so far
     while (p != nullptr)
     {
-        p = p->_next;
+        p = p->_next.get();
         ++counter;
     }
     return counter;
@@ -92,11 +112,19 @@ std::size_t size(const LLNode<ValType> * head)
 
 
 // push_front
+// Given unique_ptr to Linked List, and a ValType item, push the item
+// onto the front of the list. head becomes a pointer to the new list.
+// Requirements on Types:
+//     ValType must have a copy ctor and a (non-throwing) dctor.
+// NOTE: The above are the requirements for LLNode2<ValType>; no member
+// functions of ValType are actually used here.
+// Strong Guarantee
+// Exception Neutral
 template <typename ValType>
-void push_front(LLNode2<ValType> * & head,
+void push_front(std::unique_ptr<LLNode2<ValType>> & head,
                 const ValType & item)
 {
-    // TODO: WRITE THIS!!!
+    head = std::make_unique<LLNode2<ValType>>(item, head);
 }
 
 
@@ -109,11 +137,14 @@ void push_front(LLNode2<ValType> * & head,
 // functions of ValType are actually used here.
 // No-Throw Guarantee
 template <typename ValType>
-void pop_front(LLNode2<ValType> * & head) noexcept
+void pop_front(std::unique_ptr<LLNode2<ValType>> & head) noexcept
 {
-    // TODO: WRITE THIS!!!
+    if (head)
+    {
+        auto tmp = std::move(head->_next);
+        head = std::move(tmp);
+    }
 }
-
 
 
 #endif  //#ifndef FILE_LLNODE2_H_INCLUDED

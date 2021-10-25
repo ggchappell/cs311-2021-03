@@ -78,10 +78,10 @@ struct LLNode2 {
 // NOTE: The above are the requirements for LLNode<ValType>; no member
 // functions of ValType are actually used here.
 template <typename ValType>
-size_t size(const LLNode<ValType> * head)
+std::size_t size(const LLNode<ValType> * head)
 {
-    auto p = head;       // Iterates through list
-    size_t counter = 0;  // Number of nodes so far
+    auto p = head;            // Iterates through list
+    std::size_t counter = 0;  // Number of nodes so far
     while (p != nullptr)
     {
         p = p->_next;

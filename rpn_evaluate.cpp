@@ -1,4 +1,4 @@
-// rpn_evaluate.cpp  UNFINISHED
+// rpn_evaluate.cpp
 // Glenn G. Chappell
 // 2021-10-27
 //
@@ -26,6 +26,8 @@ using std::pair;
 using std::domain_error;
 using std::out_of_range;
 using std::overflow_error;
+#include <cstdlib>
+using std::atoi;
 
 
 // isInteger
@@ -83,7 +85,49 @@ bool isBinop(const string & str) noexcept
 void rpn(const string & token,
          stack<int> & s)
 {
-    // TODO: WRITE THIS!!!
+    if (token == "c" || token == "C")
+    {
+        stack<int>().swap(s);  // Clear stack
+        return;
+    }
+
+    if (isInteger(token))
+    {
+        s.push(atoi(token.c_str()));
+        return;
+    }
+
+    if (!isBinop(token))
+    {
+        throw domain_error("Unknown command: \"" + token + "\"");
+    }
+
+    // We have a binary arithmetic operator: +, -, *, /
+
+    if (s.size() < 2)
+    {
+        throw out_of_range("Stack underflow in \"" + token
+                         + "\" operation");
+    }
+
+    int b = s.top();
+    s.pop();
+    int a = s.top();
+    s.pop();
+
+    if (token == "+")
+        s.push(a + b);
+    else if (token == "-")
+        s.push(a - b);
+    else if (token == "*")
+        s.push(a * b);
+    else  // token == "/"
+    {
+        if (b == 0)
+            throw overflow_error("Division by zero");
+        else
+            s.push(a / b);
+    }
 }
 
 

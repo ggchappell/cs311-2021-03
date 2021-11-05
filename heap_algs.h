@@ -1,4 +1,4 @@
-// heap_algs.h  UNFINISHED
+// heap_algs.h
 // Glenn G. Chappell
 // 2021-11-05
 //
@@ -8,6 +8,15 @@
 
 #ifndef FILE_HEAP_ALGS_H_INCLUDED
 #define FILE_HEAP_ALGS_H_INCLUDED
+
+#include <cstddef>
+// For std::size_t
+#include <utility>
+// For std::swap
+#include <algorithm>
+// For std::iter_swap
+#include <cassert>
+// For assert
 
 
 // heapTest
@@ -23,8 +32,14 @@
 template<typename RAIter>
 bool heapTest(RAIter first, RAIter last)
 {
-    // TODO: WRITE THIS!!!
-    return false;  // DUMMY
+    std::size_t size = last - first;
+    // Compare each non-root item with its parent
+    for (std::size_t index = 1; index < size; ++index)
+    {
+        if (first[(index-1)/2] < first[index])
+            return false;
+    }
+    return true;
 }
 
 
@@ -43,7 +58,59 @@ bool heapTest(RAIter first, RAIter last)
 template<typename RAIter>
 void heapInsert(RAIter first, RAIter last)
 {
-    // TODO: WRITE THIS!!!
+    assert (last != first);
+    std::size_t curr = (last-first)-1;    // Index of item to sift up
+    while (curr != 0)  // While current item is not the root
+    {
+        std::size_t parent = (curr-1)/2;  // Index of parent
+        if (!(first[parent] < first[curr]))
+            break;  // No more sifting; done
+
+        // Sift up one level
+        std::swap(first[curr], first[parent]);
+        curr = parent;
+    }
+}
+
+
+// siftDown
+// Internal-use function for heapDelete, heapMake.
+// Does sift down of item at given location into existing partial Heap.
+// Requirements on Types:
+//     RAIter is a random-access iterator type.
+//     The value type of RAIter must have <, copy ctor, copy =.
+// Pre:
+//     [first, last) is a valid nonempty range.
+//     location lies in [first, last).
+//     (location, last) is a partial Heap.
+//      That is, !(first[(k-1)/2] < first[k]), whenever both
+//      first+(k-1)/2 and first+k lie in (location, last).
+// Exception neutral. Throws what & when a value-type operation throws.
+// Basic guarantee.
+// If operator< and swap do not throw, then No-Throw Guarantee.
+template<typename RAIter>
+void siftDown(RAIter first, RAIter last, RAIter location)
+{
+    std::size_t size = last - first;
+    std::size_t curr = location - first;  // Index of item to sift down
+    assert (curr < size);
+    while (true)
+    {
+        std::size_t lchild = 2*curr+1;    // Index of left child, if any
+        if (lchild >= size)               // Are there any children?
+            break;                        // If not, done
+
+        std::size_t bigchild = lchild;    // Index of bigger child
+        if (lchild+1 < size && first[lchild] < first[lchild+1])
+            bigchild = lchild+1;
+
+        if (!(first[curr] < first[bigchild]))
+            break;  // No more sifting; done
+
+        // Sift down one level
+        std::swap(first[curr], first[bigchild]);
+        curr = bigchild;
+    }
 }
 
 
@@ -61,7 +128,9 @@ void heapInsert(RAIter first, RAIter last)
 template<typename RAIter>
 void heapDelete(RAIter first, RAIter last)
 {
-    // TODO: WRITE THIS!!!
+    assert (last != first);
+    std::iter_swap(first, last-1);
+    siftDown(first, last-1, first);
 }
 
 
@@ -79,7 +148,16 @@ void heapDelete(RAIter first, RAIter last)
 template<typename RAIter>
 void heapMake(RAIter first, RAIter last)
 {
-    // TODO: WRITE THIS!!!
+    // Sift down every item in the range, in reverse order
+    for (auto location = last-1; first <= location; --location)
+        siftDown(first, last, location);
+
+    /*
+    // Above is the linear-time method. Below is the more obvious
+    //  method, which WORKS, but requires log-linear time.
+    for (auto currentEnd = first+2; currentEnd <= last; ++currentEnd)
+        heapInsert(first, currentEnd);
+    */
 }
 
 
@@ -98,7 +176,11 @@ void heapMake(RAIter first, RAIter last)
 template<typename RAIter>
 void heapToSorted(RAIter first, RAIter last)
 {
-    // TODO: WRITE THIS!!!
+    while (last-first >= 2)
+    {
+        heapDelete(first, last);
+        --last;
+    }
 }
 
 

@@ -57,7 +57,7 @@ int main()
          << endl;
     cout << "* This code demonstrates use of std::priority_queue.  *"
          << endl;
-    cout << "* But it does not really indicate what this is FOR.   *"
+    cout << "* But it does not really indicate what it is FOR.     *"
          << endl;
     cout << "* We will cover an application later in the semester. *"
          << endl;

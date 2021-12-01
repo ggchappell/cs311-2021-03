@@ -15,6 +15,8 @@ using std::vector;
 using std::size_t;
 #include <algorithm>
 using std::lower_bound;
+#include <stack>
+using std::stack;
 #include <cassert>
 // For assert
 
@@ -37,6 +39,54 @@ using std::lower_bound;
 // 0 .. n-1) separated by blanks.
 
 
+// dfs_helper
+// Prints Depth-First Search ordering of unvisited vertices of graph
+// reachable from given start vertex. Marks these vertices as visited.
+// Graph is described by given adjacency lists. Where possible, lower-
+// numbered vertex indices are printed first. There is no terminating
+// newline.
+//
+// Pre:
+//     adjlists holds the adjacency lists of an a graph (as above).
+//     start is a valid vertex index.
+//     visited has size N, where N is the size of adjlists, and each
+//      item is either 0 (unvisited) or 1 (visited).
+void dfs_helper(const vector<vector<int>> & adjlists,
+                int start,
+                vector<int> & visited)
+{
+    stack<int> s;  // Holds vertices to visit
+
+    s.push(start);
+
+    while (!s.empty())
+    {
+        // Get next vertex
+        int curr = s.top();
+        s.pop();
+
+        // Make sure it is unvisited
+        if (visited[curr] == 1)
+            continue;
+
+        // Visit it
+        cout << curr << " ";
+        visited[curr] = 1;
+
+        // And push its unvisited neighbors
+        //  (in reverse order, so we pop lower numbers first)
+        for (auto nbr_it = adjlists[curr].rbegin();
+             nbr_it != adjlists[curr].rend();
+             ++nbr_it)
+        {
+            const int nbr = *nbr_it;
+            if (visited[nbr] == 0)
+                s.push(nbr);
+        }
+    }
+}
+
+
 // dfs
 // Print Depth-First Search ordering of vertices of given graph,
 // terminated with newline.
@@ -45,8 +95,15 @@ using std::lower_bound;
 //     adjlists holds the adjacency lists of an a graph (as above).
 void dfs(const vector<vector<int>> & adjlists)
 {
-    cout << "[DFS NOT WRITTEN]" << endl;  // DUMMY
-    // TODO: WRITE THIS!!!
+    const int N = int(adjlists.size());
+    vector<int> visited(N, 0);
+                   // visited[i] == 1 if vertex i has been visited;
+                   //  0 otherwise
+    for (int i = 0; i < N; ++i)
+    {
+        dfs_helper(adjlists, i, visited);
+    }
+    cout << endl;
 }
 
 

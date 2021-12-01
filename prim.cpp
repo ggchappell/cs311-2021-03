@@ -1,0 +1,301 @@
+// prim.cpp
+// Glenn G. Chappell
+// 2021-12-01
+//
+// For CS 311 Fall 2021
+// Prim's Algorithm
+
+#include <iostream>
+using std::cout;
+using std::endl;
+using std::cin;
+#include <iomanip>
+using std::setw;
+#include <vector>
+using std::vector;
+#include <cstddef>
+using std::size_t;
+#include <utility>
+using std::pair;
+#include <queue>
+using std::priority_queue;
+#include <cassert>
+// For assert
+
+
+// CONVENTIONS
+
+// A GRAPH is represented by adjacency lists.
+// We use N for the number of vertices in a graph. Vertices are numbered
+// 0 .. N-1.
+//
+// Adjacency lists are stored in a vector<vector<int>> with size N.
+// Item i in this vector is a list of the neighbors of vertex i, in
+// ascending order.
+
+// A WEIGHTED GRAPH (weights on edges) is represented by a matrix of
+// weights, possibly along with adjacency lists. The matrix is stored as
+// a vector<vector<int>> with size N, in which all items have size N.
+// Entry [i][j] holds the weight of the edge with endpoints i, j, if
+// this edge exists. Otherwise it holds the special value INF,
+// representing +infinity.
+//
+// To create a weighed graph represented as above, first set a constant
+// N to the number of vertices. Call emptyWeightMatrix, passing N, to
+// get a weight matrix for an N-vertex graph with all weights set to
+// INF. Make zero or more calls to setWeight to set the weights of
+// various edges. Lastly, call makeAdjLists to get adjacency lists for
+// the graph.
+
+
+const int INF = -1;           // Represents +infinity in weight matrix
+
+using Edge = pair<int, int>;  // Type for edge of graph
+                              //  Integers are indices of endpoints
+
+
+// prim
+// Compute minimum spanning tree using Prim's Algorithm.
+// Given weighted graph (represented as discussed above), order of
+// graph, adjacency lists, and start vertex.
+vector<Edge> prim(
+    const vector<vector<int>> & adjlists,  // adjacency lists
+    const vector<vector<int>> & wmatrix,   // weight matrix
+    int start)                             // index of start vertex
+{
+    const int N = int(adjlists.size());
+                                  // Number of vertices in graph
+    assert (wmatrix.size() == size_t(N));
+    for (const auto row : wmatrix)
+    {
+        assert (row.size() == size_t(N));
+    }
+    assert (0 <= start && start < N);
+
+    vector<int> reachable(N, 0);  // item i: 1 if vert i reachable
+    vector<Edge> tree;            // Edges in tree
+
+    // Make priority queue of edges; top edge is one of least weight
+
+    // Comparison function for priority_queue
+    auto comp = [&](const Edge & a,
+                    const Edge & b)
+    {
+        // Get weight of edges a & b
+        auto wt_a = wmatrix[a.first][a.second];
+        auto wt_b = wmatrix[b.first][b.second];
+        return wt_b < wt_a;       // Compare reversed to get smallest
+    };
+    // The priority queue itself
+    priority_queue<Edge, vector<Edge>, decltype(comp)> pq(comp);
+
+    // Handle start vertex
+    reachable[start] = 1;
+    for (auto v : adjlists[start])
+    {
+        if (reachable[v] == 0)
+            pq.push(Edge(start, v));
+    }
+
+    // Repeat until done with all edges
+    while (!pq.empty())
+    {
+        // Get least-weight edge from reachable to not-reachable vertex
+        auto e = pq.top();
+        pq.pop();
+
+        // Check "far" endpoint of edge. Reachable?
+        auto u = e.second;
+        if (reachable[u] == 1)
+            continue;
+
+        // Handle new edge (e) & vertex (u)
+        tree.push_back(e);
+        if (tree.size()+1 == size_t(N))  // Easy optimization
+            break;
+        reachable[u] = 1;
+        for (auto v : adjlists[u])
+        {
+            if (reachable[v] == 0)
+                pq.push(Edge(u, v));
+        }
+    }
+
+    // Done
+    return tree;
+}
+
+
+// emptyWeightMatrix
+// Return weight matrix (see above) for an edgeless graph with N
+// vertices. Edge weights can then be added using setWeight.
+//
+// Basically, this function is a constructor, except that we are not
+// using a class here.
+vector<vector<int>> emptyWeightMatrix(int N)
+{
+    return vector<vector<int>>(N, vector<int>(N, INF));
+}
+
+
+// setWeight
+// Sets weight of a,b edge in weighted graph described by
+//  wmatrix (see above).
+void setWeight(vector<vector<int>> & wmatrix,
+               int a, int b,
+               int wt)
+{
+    wmatrix[a][b] = wt;
+    wmatrix[b][a] = wt;
+}
+
+
+// printWeightMatrix
+// Given a matrix stored in a vector, with the (i,j) entry stored in
+// matrix[i*numcols+j], print the matrix, entries separated by blanks,
+// rows ending with newline. Each entry is printed as its numerical
+// value, or "-" if it is INF. Column labels are printed above the
+// matrix; row labels are printed to its left. All numbers are printed
+// with a field width of 3, padded on the left with blanks.
+void printWeightMatrix(const vector<vector<int>> & wmatrix)
+{
+    const int N = int(wmatrix.size());
+
+    cout << "    | ";
+    for (int col = 0; col < N; ++col)
+    {
+        cout << setw(3) << col << " ";
+    }
+    cout << "\n";
+
+    cout << " ---+-";
+    for (int col = 0; col < N; ++col)
+    {
+        cout << "----";
+    }
+    cout << "\n";
+
+    for (int row = 0; row < N; ++row)
+    {
+        cout << setw(3) << row << " | ";
+        for (int col = 0; col < N; ++col)
+        {
+            int value = wmatrix[row][col];
+            if (value == INF)
+                cout << "  -";
+            else
+                cout << setw(3) << value;
+            cout << " ";
+        }
+        cout << endl;
+    }
+}
+
+
+// makeAdjLists
+// Given matrix representation of weighted graph (see above), return
+// adjacency lists.
+vector<vector<int>> makeAdjLists(const vector<vector<int>> & wmatrix)
+{
+    const int N = int(wmatrix.size());
+
+    vector<vector<int>> adjlists(N, vector<int>());
+    for (int i = 0; i < N; ++i)
+    {
+        for (int j = 0; j < N; ++j)
+        {
+            if (wmatrix[i][j] != INF)
+                adjlists[i].push_back(j);
+        }
+    }
+    return adjlists;
+}
+
+
+// printAdjacencyLists
+// Given adjacency lists for a graph, print them, each lists on a
+// separate line, preceded by the index of the vertex whose lists this
+// is, entries separated by commas.
+void printAdjacencyLists(const vector<vector<int>> & adjlists)
+{
+    const int N = int(adjlists.size());
+    for (int i = 0; i < N; ++i)
+    {
+        cout << setw(3) << i << ": ";
+        for (int j = 0; size_t(j) < adjlists[i].size(); ++j)
+        {
+            if (j != 0)
+                cout << ", ";
+            cout << adjlists[i][j];
+        }
+        cout << endl;
+    }
+}
+
+
+// userPause
+// Wait for user to press ENTER: read all chars through first newline.
+void userPause()
+{
+    std::cout.flush();
+    while (std::cin.get() != '\n') ;
+}
+
+
+// Main program
+// Compute a minimum spanning tree using function prim. Print graph and
+// result.
+int main()
+{
+    const int N = 5;  // Number of vertices of graph
+
+    // Set up weight matrix for graph;
+    auto wmatrix = emptyWeightMatrix(N);
+    setWeight(wmatrix, 0, 1, 7);
+    setWeight(wmatrix, 0, 2, 6);
+    setWeight(wmatrix, 0, 3, 2);
+    setWeight(wmatrix, 0, 4, 8);
+    setWeight(wmatrix, 1, 2, 3);
+    setWeight(wmatrix, 1, 4, 4);
+    setWeight(wmatrix, 2, 3, 5);
+    setWeight(wmatrix, 2, 4, 1);
+    setWeight(wmatrix, 3, 4, 9);
+
+    // Print weights
+    cout << "Weight matrix:" << "\n";
+    printWeightMatrix(wmatrix);
+    cout << "\n";
+
+    // Compute & print adjacency lists
+    auto adjlists = makeAdjLists(wmatrix);
+    cout << "Adjacency lists:\n";
+    printAdjacencyLists(adjlists);
+    cout << "\n";
+
+    // Pause before running algorithm
+    cout << "Press ENTER to run Prim's Algorithm ";
+    userPause();
+
+    // Run Prim's Algorithm & print result
+    const int start = 0;
+    cout << "Running Prim's Algorithm "
+         << "(start vertex: " << start << ") ... ";
+    cout.flush();
+    vector<Edge> tree = prim(adjlists, wmatrix, start);
+    cout << "DONE\n" << endl;
+
+    cout << "Edges in minimum spanning tree:\n";
+    if (tree.size() == 0)
+        cout << "[NONE]\n";
+    for (int i = 0; size_t(i) < tree.size(); ++i)
+    {
+        cout << setw(3) << tree[i].first << ", " << tree[i].second
+             << "\n";
+    }
+    cout << endl;
+
+    // Wait for user
+    cout << "Press ENTER to quit ";
+    userPause();
+}
+

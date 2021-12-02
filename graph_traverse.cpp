@@ -1,9 +1,10 @@
-// graph_traverse.cpp  UNFINISHED
+// graph_traverse.cpp
 // Glenn G. Chappell
-// 2021-11-29
+// Started: 2021-11-29
+// Updated: 2021-12-01
 //
 // For CS 311 Fall 2021
-// Graph traversals: DFS
+// Graph traversals: DFS & BFS
 
 #include <iostream>
 using std::cout;
@@ -17,6 +18,8 @@ using std::size_t;
 using std::lower_bound;
 #include <stack>
 using std::stack;
+#include <queue>
+using std::queue;
 #include <cassert>
 // For assert
 
@@ -107,12 +110,81 @@ void dfs(const vector<vector<int>> & adjlists)
 }
 
 
+// bfs_helper
+// Prints Breadth-First Search ordering of unvisited vertices of graph
+// reachable from given start vertex. Marks these vertices as visited.
+// Graph is described by given adjacency lists. Where possible, lower-
+// numbered vertex indices are printed first. There is no terminating
+// newline.
+//
+// Pre:
+//     adjlists holds the adjacency lists of an a graph (as above).
+//     start is a valid vertex index.
+//     visited has size N, where N is the size of adjlists, and each
+//      item is either 0 (unvisited) or 1 (visited).
+void bfs_helper(const vector<vector<int>> & adjlists,
+                int start,
+                vector<int> & visited)
+{
+    queue<int> s;  // Holds vertices to visit
+
+    s.push(start);
+
+    while (!s.empty())
+    {
+        // Get next vertex
+        int curr = s.front();
+        s.pop();
+
+        // Make sure it is unvisited
+        if (visited[curr] == 1)
+            continue;
+
+        // Visit it
+        cout << curr << " ";
+        visited[curr] = 1;
+
+        // And push its unvisited neighbors
+        for (auto nbr_it = adjlists[curr].begin();
+             nbr_it != adjlists[curr].end();
+             ++nbr_it)
+        {
+            const int nbr = *nbr_it;
+            if (visited[nbr] == 0)
+                s.push(nbr);
+        }
+    }
+}
+
+
+// bfs
+// Print Breadth-First Search ordering of vertices of given graph,
+// terminated with newline.
+//
+// Pre:
+//     adjlists holds the adjacency lists of an a graph (as above).
+void bfs(const vector<vector<int>> & adjlists)
+{
+    const int N = int(adjlists.size());
+    vector<int> visited(N, 0);
+                   // visited[i] == 1 if vertex i has been visited;
+                   //  0 otherwise
+    for (int i = 0; i < N; ++i)
+    {
+        bfs_helper(adjlists, i, visited);
+    }
+    cout << endl;
+}
+
+
 // printTraversals
-// Given adjacency lists for graph, print DFS.
+// Given adjacency lists for graph, print DFS & BFS.
 void printTraversals(const vector<vector<int>> & adjlists)
 {
     cout << "DFS: ";
     dfs(adjlists);
+    cout << "BFS: ";
+    bfs(adjlists);
     cout << endl;
 }
 
@@ -230,7 +302,7 @@ void userPause()
 
 
 // Main program
-// Do DFS on various graphs, printing results.
+// Do DFS & BFS on various graphs, printing results.
 int main()
 {
     vector<vector<int>> adjlists;  // Holds adjacency lists

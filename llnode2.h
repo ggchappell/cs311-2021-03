@@ -1,7 +1,7 @@
 // llnode2.h
 // Glenn G. Chappell
-// Updated: 2021-10-25
 // Started: 2021-10-22
+// Updated: 2021-10-25
 //
 // For CS 311 Fall 2021
 // Header for struct LLNode2
